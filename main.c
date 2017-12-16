@@ -217,49 +217,47 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
          }
          data_array[data_length] = "\0";
 
-          data_action = strtok(data_array,data_char);
-          data_doorId = strtok(NULL, data_char);
-          data_login = strtok(NULL, data_char);
-          data_password = strtok(NULL, data_char);
-          data_access = strtok(NULL, data_char);
+            data_action = strtok(data_array,data_char);
+            data_doorId = strtok(NULL, data_char);
+            data_login = strtok(NULL, data_char);
+            data_password = strtok(NULL, data_char);
+            data_access = strtok(NULL, data_char);
       
-         app_message_t app_message;
-         app_message.data_action = data_action;
-         app_message.data_doorId = data_doorId;
-         app_message.data_login = data_login;
-         app_message.data_password = data_password;
-         app_message.data_access = data_access;
+           app_message_t app_message;
+           app_message.data_action = data_action;
+           app_message.data_doorId = data_doorId;
+           app_message.data_login = data_login;
+           app_message.data_password = data_password;
+           app_message.data_access = data_access;
 
          NRF_LOG_INFO("Message to handle: %s, %s, %s, %s, %s", app_message.data_action,  app_message.data_doorId,  app_message.data_login, app_message.data_password, app_message.data_access );
 
-
-
          app_message_handler(app_message);
 
-
-
-
-
-        for (uint32_t i = 0; i < strlen(data_login); i++)
-        {
-            do
-            {
-               // err_code = app_uart_put(p_evt->params.rx_data.p_data[i]);
-               err_code = app_uart_put(data_login[i]);
-                if ((err_code != NRF_SUCCESS) && (err_code != NRF_ERROR_BUSY))
-                {
-                    NRF_LOG_ERROR("Failed receiving NUS message. Error 0x%x. ", err_code);
-                    APP_ERROR_CHECK(err_code);
-                }
-            } while (err_code == NRF_ERROR_BUSY);
-        }
-//        if (data_login[strlen(data_login)-1] == '\r')
+//
+//
+//
+//
+//        for (uint32_t i = 0; i < strlen(data_login); i++)
 //        {
-//            while (app_uart_put('\n') == NRF_ERROR_BUSY);
+//            do
+//            {
+//               // err_code = app_uart_put(p_evt->params.rx_data.p_data[i]);
+//              // err_code = app_uart_put(data_login[i]);
+//                if ((err_code != NRF_SUCCESS) && (err_code != NRF_ERROR_BUSY))
+//                {
+//                    NRF_LOG_ERROR("Failed receiving NUS message. Error 0x%x. ", err_code);
+//                    APP_ERROR_CHECK(err_code);
+//                }
+//            } while (err_code == NRF_ERROR_BUSY);
 //        }
-
-
-        app_uart_put('\r');
+////        if (data_login[strlen(data_login)-1] == '\r')
+////        {
+////            while (app_uart_put('\n') == NRF_ERROR_BUSY);
+////        }
+//
+//
+//        app_uart_put('\r');
 
 
     }
@@ -278,6 +276,8 @@ void app_message_handler(app_message_t app_message){
        
         
         uint16_t rel_length = 2;
+
+        uint32_t err_code;
         
        
 
@@ -297,14 +297,23 @@ void app_message_handler(app_message_t app_message){
 
                 // open door
                 case 'o': 
-                        open_door(doorId); 
+                        
                         NRF_LOG_INFO("Door open: %c", doorId);
+                        uint8_t *message = open_door(doorId); 
+                        for (uint32_t i = 0; i < 2; i++){
+                                app_uart_put(message[i]);
+                        }
+
                         break;
 
                 //close door
                 case 'c': 
                         close_door(doorId); 
                         NRF_LOG_INFO("Close open: %c", doorId);
+
+
+
+
                         break;
 
 
@@ -337,12 +346,29 @@ void app_message_handler(app_message_t app_message){
 
                                 if( strcmp(user_from_mess.data_password, users_tab[i].data_password)==0 && strcmp(user_from_mess.data_login, users_tab[i].data_login)==0) {
 
-                                          NRF_LOG_INFO("User %s logged",user_from_mess.data_login);
                                           uint8_t *reply = create_replay_message(USER_LOGGED);
                                           ble_nus_string_send(&m_nus, reply, &rel_length);
-                                          exist_flag = 1;
-                                          ble_nus_string_send(&m_nus, users_tab[i].door_access, &rel_length);
 
+
+                                          uint8_t *acc_mess;
+
+                                          if( strcmp(users_tab[i].door_access, "1") == 0) {
+                                                  acc_mess = "1";
+                                          } else if ( strcmp(users_tab[i].door_access, "2") == 0){
+                                                      acc_mess = "2";
+                                          }else if ( strcmp(users_tab[i].door_access, "12") == 0){
+                                                      acc_mess = "12";
+                                          }
+
+                                          NRF_LOG_INFO("Accesses sent:  %s",acc_mess);
+
+                                          uint8_t len = strlen(acc_mess);
+                                             ble_nus_string_send(&m_nus, acc_mess, &len);
+
+
+
+                                          NRF_LOG_INFO("User %s logged",user_from_mess.data_login);
+                                          exist_flag = 1;
                                 }
                                 else if( strcmp(user_from_mess.data_login, users_tab[i].data_login)==0){
                                          NRF_LOG_INFO("User %s has entered wrong password",user_from_mess.data_login);
