@@ -124,8 +124,10 @@ static ble_uuid_t m_adv_uuids[]          =                                      
     {BLE_UUID_NUS_SERVICE, NUS_SERVICE_UUID_TYPE}
 };
 
+ 
+ static  user_t users_tab[10] = {{"oooooooooo","oooooooooo","oo"}};
 
- static user_t users[10];
+
 
 //static struct Users users_array;
 
@@ -269,14 +271,25 @@ void app_message_handler(app_message_t app_message){
 
 
         const char *admin_login = "admin";
+
+
+        user_t empty_user = {"oooooooooo", "oooooooooo", "oo"};
+        user_t user_from_mess;
+       
+        
         uint16_t rel_length = 2;
-        user_t user;
+        
+       
 
         char action = app_message.data_action[0];
         char doorId = app_message.data_doorId[0];
         const char *mess_login = app_message.data_login;
         const char *mess_pass = app_message.data_password;
+        const char *mess_acc = app_message.data_access;
+
+        int i = 0;
         
+
 
 
         switch(action){
@@ -305,110 +318,78 @@ void app_message_handler(app_message_t app_message){
 
                          }
                          break;
-//                case 's':
-//                          user.data_login = app_message.data_login;
-//                          user.data_password = app_message.data_password;
-//                          user.door_access = app_message.data_access;
-//
-//                          NRF_LOG_INFO("User to create: %s, pass: %s, access: %s",user.data_login,user.data_password,user.door_access);
-//
-//                          save_user(user, users, MAX_USERS_SIZE);
-//
-//                          NRF_LOG_INFO("User created: %s, pass: %s, access: %s",users[0].data_login,users[0].data_password,users[0].door_access);
-//
-//                          uint8_t *reply = create_replay_message(USER_SAVED);
-//                          //NRF_LOG_INFO("User created: %s, pass: %s, access: %s",user.data_login,user.data_password,user.door_access);
-//                          ble_nus_string_send(&m_nus, reply, &rel_length);
-//                          break;
-//                         
+
+                case 'u':
+                            strcpy(user_from_mess.data_login,app_message.data_login);
+                            strcpy(user_from_mess.data_password,app_message.data_password); 
+                            strcpy(user_from_mess.door_access,app_message.data_access);
+                            NRF_LOG_INFO("User to get access: %s, pass: %s, access: %s",user_from_mess.data_login,user_from_mess.data_password,user_from_mess.door_access);
+                            uint8_t exist_flag = 0;
+
+                            for (int i = 0; i < 10; i++){
+
+                                if( strcmp(user_from_mess.data_password, users_tab[i].data_password)==0 && strcmp(user_from_mess.data_login, users_tab[i].data_login)==0) {
+
+                                          NRF_LOG_INFO("User %s logged",user_from_mess.data_login);
+                                          uint8_t *reply = create_replay_message(USER_LOGGED);
+                                          ble_nus_string_send(&m_nus, reply, &rel_length);
+                                          exist_flag = 1;
+                                          ble_nus_string_send(&m_nus, users_tab[i].door_access, &rel_length);
+
+                                }
+                                else if( strcmp(user_from_mess.data_login, users_tab[i].data_login)==0){
+                                         NRF_LOG_INFO("User %s has entered wrong password",user_from_mess.data_login);
+                                         uint8_t *reply = create_replay_message(WRONG_PASSWORD);
+                                         ble_nus_string_send(&m_nus, reply, &rel_length);
+                                         exist_flag = 1;
+                                }
+                            }
+
+                            if(exist_flag == 0){
+                            
+                               NRF_LOG_INFO("the account does not exist");
+                               uint8_t *reply_not_exist = create_replay_message(ERROR);
+                               ble_nus_string_send(&m_nus, reply_not_exist, &rel_length);
+
+                            }
+                         break;
+                case 's':
+                            
+                            strcpy(user_from_mess.data_login,app_message.data_login);
+                            strcpy(user_from_mess.data_password,app_message.data_password); 
+                            strcpy(user_from_mess.door_access,app_message.data_access);
+                            NRF_LOG_INFO("User to create: %s, pass: %s, access: %s",user_from_mess.data_login,user_from_mess.data_password,user_from_mess.door_access);
+                                           
+
+                            for(int i = 9; i > 0; i--){
+
+                                  users_tab[i] = users_tab[i-1];
+
+                            }
+
+                            strcpy(users_tab[0].data_login ,user_from_mess.data_login);
+                            strcpy(users_tab[0].data_password ,user_from_mess.data_password);
+                            strcpy(users_tab[0].door_access ,user_from_mess.door_access);
+
+                              NRF_LOG_INFO("User created: %s, pass: %s, access: %s",users_tab[0].data_login,users_tab[0].data_password,users_tab[0].door_access);
+                              uint8_t *reply = create_replay_message(USER_SAVED);
+                              ble_nus_string_send(&m_nus, reply, &rel_length);
+
+
+                            strcpy(user_from_mess.data_login,empty_user.data_login);
+                            strcpy(user_from_mess.data_password,empty_user.data_password); 
+                            strcpy(user_from_mess.door_access,empty_user.door_access);
+
+                          break;
+
+                   case 'g':
+                             NRF_LOG_INFO("Users_tab[0], login = %s, pass = %s, acc = %s", users_tab[0].data_login, users_tab[0].data_password,users_tab[0].door_access);
+                             NRF_LOG_INFO("Users_tab[1], login = %s, pass = %s, acc = %s", users_tab[1].data_login, users_tab[1].data_password,users_tab[1].door_access);
+                             
+                             break;
+                         
+                         
         }
-
-
-//
-//        else if( app_message.data_action[0] == 's'){
-//
-//          user_t user;
-//          user.data_login = app_message.data_login;
-//          user.data_password = app_message.data_password;
-//          user.door_access = app_message.data_access;
-//
-//          save_user(user, users);
-//          NRF_LOG_INFO("User created: %s", users[0].data_login);
-//          
-//          NRF_LOG_INFO("User pass: %s", users[0].data_password);
-//          NRF_LOG_INFO("User accesses: %s", users[0].door_access);
-//
-//         uint8_t save_user_replay[2];
-//         save_user_replay[0]= 's';
-//         save_user_replay[1]= 'u';
-//         uint16_t len = 2;
-//          ble_nus_string_send(&m_nus, save_user_replay, &len);
-//
-//        }
-//        else if (app_message.data_action[0] == 'd'){
-//
-//            for(int i; i< sizeof(users); i++){
-//
-//                  NRF_LOG_INFO("User %i: %s", i, users[i].data_login);
-//                  NRF_LOG_INFO("User password %i: %s", i, users[i].data_password);
-//                  NRF_LOG_INFO("User accesses %i: %s", i, users[i].door_access);
-//            }
-//        }
-//
-//        else if (app_message.data_action[0] == 'u' ){
-//
-//            NRF_LOG_INFO("mes user: %s", app_message.data_login);
-//            NRF_LOG_INFO("mes user pas: %s", app_message.data_password);
-//            NRF_LOG_INFO("mes user acc: %s", app_message.data_access);
-//
-//        user_t log_user;
-//
-//        log_user.data_login = app_message.data_login;
-//        log_user.data_password = app_message.data_password;
-//        log_user.door_access = 'nn';
-//
-//          uint16_t len =4 ;
-//          uint8_t user_replay[4];
-//
-//          for (int i=0; i<sizeof(users);i++){
-//
-//            if(log_user.data_login == users[i].data_login && log_user.data_password ==  users[i].data_password){
-//            NRF_LOG_INFO("Log user: %s", users[i].data_login);
-//            NRF_LOG_INFO("Log user pas: %s", users[i].data_password);
-//            NRF_LOG_INFO("Log user acc: %s", users[i].door_access);
-//
-//              log_user.door_access = users[i].door_access;
-//              
-//              uint8_t door_access_len = strlen(log_user.door_access);
-//
-//
-//                    if(door_access_len == 2){
-//                        user_replay[0]= 'u';
-//                        user_replay[1]= 's';
-//                        user_replay[2] = log_user.door_access[0];
-//                        user_replay[3] = log_user.door_access[1];
-//                    }else if( door_access_len == 1){
-//                        user_replay[0]= 'u';
-//                        user_replay[1]= 's';
-//                        user_replay[2] = log_user.door_access[0];
-//                        user_replay[3] = 'n';
-//                    }
-//                break;
-//
-//            }else{
-//              user_replay[0] = 'e';
-//              user_replay[1] = 'r';
-//              user_replay[2] = 'r';
-//              user_replay[3] = 'o';
-//              }
-//         
-//          }
-//          ble_nus_string_send(&m_nus, user_replay, &len);
-//
-//        }
-
-
-        
 }
 
 

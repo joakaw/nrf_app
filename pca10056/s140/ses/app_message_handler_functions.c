@@ -27,18 +27,6 @@ void close_door(uint8_t door_id){
 }
 
 
-void save_user(user_t user, user_t *users, uint8_t users_max_size){
-
-        uint8_t tab_size = users_max_size;
-
-        for(int i = tab_size; i > 0; i--){
-            users[i] = users[i-1];
-        }
-        users[0].data_login = user.data_login;
-        users[0].data_password = user.data_password;
-        users[0].door_access = user.door_access;
-}
-
 uint8_t* create_replay_message(enum replay_message_type mess_type){
 
           uint8_t *replay_message;
