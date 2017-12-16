@@ -288,21 +288,27 @@ void app_message_handler(app_message_t app_message){
         const char *mess_acc = app_message.data_access;
 
         int i = 0;
+        int j = 0;
         
 
 
 
         switch(action){
 
-
+                // open door
                 case 'o': 
                         open_door(doorId); 
                         NRF_LOG_INFO("Door open: %c", doorId);
                         break;
+
+                //close door
                 case 'c': 
                         close_door(doorId); 
                         NRF_LOG_INFO("Close open: %c", doorId);
                         break;
+
+
+                // login as administrator
                 case 'a':
                          if(strcmp(mess_login, admin_login)== 0 && strcmp(mess_pass, admin_login)== 0){  //correct login and password
 
@@ -319,6 +325,7 @@ void app_message_handler(app_message_t app_message){
                          }
                          break;
 
+                //login as normal user
                 case 'u':
                             strcpy(user_from_mess.data_login,app_message.data_login);
                             strcpy(user_from_mess.data_password,app_message.data_password); 
@@ -353,6 +360,8 @@ void app_message_handler(app_message_t app_message){
 
                             }
                          break;
+
+                //save new user
                 case 's':
                             
                             strcpy(user_from_mess.data_login,app_message.data_login);
@@ -382,20 +391,28 @@ void app_message_handler(app_message_t app_message){
 
                           break;
 
+
+                    //send all users
                    case 'g':
-                             NRF_LOG_INFO("Users_tab[0], login = %s, pass = %s, acc = %s", users_tab[0].data_login, users_tab[0].data_password,users_tab[0].door_access);
-                             NRF_LOG_INFO("Users_tab[1], login = %s, pass = %s, acc = %s", users_tab[1].data_login, users_tab[1].data_password,users_tab[1].door_access);
-                             
+
+                              while(strcmp(users_tab[j].data_login, empty_user.data_login) != 0){
+
+                                uint8_t *usr = users_tab[j].data_login;
+                                strncat(usr, ":", 1);
+                                strncat(usr, users_tab[j].door_access, strlen(users_tab[j].door_access));
+                                uint16_t usrlen =strlen(usr);
+
+                                ble_nus_string_send(&m_nus, usr, &usrlen);
+                                j++;
+                              }
+
+                               uint16_t endlen = 3;
+                               ble_nus_string_send(&m_nus, "end", &endlen);
                              break;
                          
                          
         }
 }
-
-
-
-
-
 
 
 
