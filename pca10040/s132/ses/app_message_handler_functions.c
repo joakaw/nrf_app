@@ -12,11 +12,11 @@ uint8_t* open_door(uint8_t door_id){
     
     case '1': 
           nrf_gpio_pin_set(LED_EXTERNAL1);
-          return "o1";
+          return "o1\n";
           break;
     case '2': 
           nrf_gpio_pin_set(LED_EXTERNAL2); 
-          return "o2";
+          return "o2\n";
           break;
   }
 
@@ -24,13 +24,20 @@ uint8_t* open_door(uint8_t door_id){
 
 }
 
-void close_door(uint8_t door_id){
+uint8_t * close_door(uint8_t door_id){
 
   switch(door_id){
     
-    case '1': nrf_gpio_pin_clear(LED_EXTERNAL1); break;
-    case '2': nrf_gpio_pin_clear(LED_EXTERNAL2); break;
+    case '1': 
+        nrf_gpio_pin_clear(LED_EXTERNAL1);
+        return "c1\n";
+        break;
+    case '2': 
+        nrf_gpio_pin_clear(LED_EXTERNAL2);
+        return "c2\n";
+        break;
   }
+    return create_replay_message(ERROR);
 
 }
 
