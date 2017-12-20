@@ -112,7 +112,6 @@
 
 
 
-
 BLE_NUS_DEF(m_nus);                                                                 /**< BLE NUS service instance. */
 NRF_BLE_GATT_DEF(m_gatt);                                                           /**< GATT module instance. */
 BLE_ADVERTISING_DEF(m_advertising);                                                 /**< Advertising module instance. */
@@ -201,13 +200,13 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
 
 
         uint32_t data_length = p_evt->params.rx_data.length;
-        static  uint8_t data_array[BLE_NUS_MAX_DATA_LEN];
-        static  uint8_t data_char[] = {':'};
-         uint8_t *data_login;
-         uint8_t *data_password;
-         uint8_t *data_action;
-         uint8_t *data_doorId;
-         uint8_t *data_access;
+        static  char data_array[BLE_NUS_MAX_DATA_LEN];
+        static  char data_char[] = {':'};
+         char *data_login;
+         char *data_password;
+         char *data_action;
+         char *data_doorId;
+         char *data_access;
      
 
          for (uint32_t i = 0; i < data_length; i++){
@@ -233,31 +232,6 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
          NRF_LOG_INFO("Message to handle: %s, %s, %s, %s, %s", app_message.data_action,  app_message.data_doorId,  app_message.data_login, app_message.data_password, app_message.data_access );
 
          app_message_handler(app_message);
-
-//
-//
-//
-//
-//        for (uint32_t i = 0; i < strlen(data_login); i++)
-//        {
-//            do
-//            {
-//               // err_code = app_uart_put(p_evt->params.rx_data.p_data[i]);
-//              // err_code = app_uart_put(data_login[i]);
-//                if ((err_code != NRF_SUCCESS) && (err_code != NRF_ERROR_BUSY))
-//                {
-//                    NRF_LOG_ERROR("Failed receiving NUS message. Error 0x%x. ", err_code);
-//                    APP_ERROR_CHECK(err_code);
-//                }
-//            } while (err_code == NRF_ERROR_BUSY);
-//        }
-////        if (data_login[strlen(data_login)-1] == '\r')
-////        {
-////            while (app_uart_put('\n') == NRF_ERROR_BUSY);
-////        }
-//
-//
-//        app_uart_put('\r');
 
 
     }
@@ -300,7 +274,7 @@ void app_message_handler(app_message_t app_message){
                         
                         NRF_LOG_INFO("Door open: %c", doorId);
                         uint8_t *message = open_door(doorId); 
-                        for (uint32_t i = 0; i < 2; i++){
+                        for (uint32_t i = 0; i < 3; i++){
                                 app_uart_put(message[i]);
                         }
 
@@ -308,11 +282,12 @@ void app_message_handler(app_message_t app_message){
 
                 //close door
                 case 'c': 
-                        close_door(doorId); 
-                        NRF_LOG_INFO("Close open: %c", doorId);
-
-
-
+                        
+                        NRF_LOG_INFO("Door close: %c", doorId);
+                        uint8_t *cmessage = close_door(doorId);  
+                        for (uint32_t i = 0; i < 3; i++){
+                               app_uart_put(cmessage[i]);
+                        }
 
                         break;
 
@@ -362,7 +337,7 @@ void app_message_handler(app_message_t app_message){
 
                                           NRF_LOG_INFO("Accesses sent:  %s",acc_mess);
 
-                                          uint8_t len = strlen(acc_mess);
+                                             uint16_t len = (uint16_t)strlen(acc_mess);
                                              ble_nus_string_send(&m_nus, acc_mess, &len);
 
 
@@ -421,9 +396,12 @@ void app_message_handler(app_message_t app_message){
                     //send all users
                    case 'g':
 
-                              while(strcmp(users_tab[j].data_login, empty_user.data_login) != 0){
+                              while(strcmp(users_tab[j].data_login, empty_user.data_login) != 0)
+                              {
 
-                                uint8_t *usr = users_tab[j].data_login;
+                                char usr[USER_DISPLAY_MAX_SIZE];
+                                strncpy(usr, users_tab[j].data_login, strlen(users_tab[j].data_login) );
+                               // strncpy(usr, users_tab[j].data_login, sizeof(usr) );
                                 strncat(usr, ":", 1);
                                 strncat(usr, users_tab[j].door_access, strlen(users_tab[j].door_access));
                                 uint16_t usrlen =strlen(usr);
@@ -786,7 +764,7 @@ void uart_event_handle(app_uart_evt_t * p_event)
             UNUSED_VARIABLE(app_uart_get(&data_array[index]));
             index++;
 
-            if ((data_array[index - 1] == '\n') || (index >= (m_ble_nus_max_data_len)))
+            if ((data_array[index - 1] == '\n'))
             {
                 NRF_LOG_DEBUG("Ready to send data over BLE NUS");
                 NRF_LOG_HEXDUMP_DEBUG(data_array, index);
