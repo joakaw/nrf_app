@@ -306,26 +306,40 @@ void app_message_handler(app_message_t app_message){
                             strcpy(user_from_mess.data_password,app_message.data_password); 
                             strcpy(user_from_mess.door_access,app_message.data_access);
                             NRF_LOG_INFO("User to create: %s, pass: %s, access: %s",user_from_mess.data_login,user_from_mess.data_password,user_from_mess.door_access);
-                                           
 
-                            for(int i = 9; i > 0; i--){
 
-                                  users_tab[i] = users_tab[i-1];
+                            if(is_login_exist(user_from_mess.data_login, users_tab, MAX_USERS_SIZE) ){
+
+                                      uint8_t *reply_exist = create_replay_message(LOGIN_EXISTS);
+                                      ble_nus_string_send(&m_nus, reply_exist, &rel_length);
 
                             }
-
-                            strcpy(users_tab[0].data_login ,user_from_mess.data_login);
-                            strcpy(users_tab[0].data_password ,user_from_mess.data_password);
-                            strcpy(users_tab[0].door_access ,user_from_mess.door_access);
-
-                              NRF_LOG_INFO("User created: %s, pass: %s, access: %s",users_tab[0].data_login,users_tab[0].data_password,users_tab[0].door_access);
-                              uint8_t *reply = create_replay_message(USER_SAVED);
-                              ble_nus_string_send(&m_nus, reply, &rel_length);
+                            else
+                            {
 
 
-                            strcpy(user_from_mess.data_login,empty_user.data_login);
-                            strcpy(user_from_mess.data_password,empty_user.data_password); 
-                            strcpy(user_from_mess.door_access,empty_user.door_access);
+                                    for(int i = 9; i > 0; i--){
+
+                                          users_tab[i] = users_tab[i-1];
+
+                                    }
+
+                                    strcpy(users_tab[0].data_login ,user_from_mess.data_login);
+                                    strcpy(users_tab[0].data_password ,user_from_mess.data_password);
+                                    strcpy(users_tab[0].door_access ,user_from_mess.door_access);
+
+                                      NRF_LOG_INFO("User created: %s, pass: %s, access: %s",users_tab[0].data_login,users_tab[0].data_password,users_tab[0].door_access);
+                                      uint8_t *reply = create_replay_message(USER_SAVED);
+                                      ble_nus_string_send(&m_nus, reply, &rel_length);
+
+
+                                    strcpy(user_from_mess.data_login,empty_user.data_login);
+                                    strcpy(user_from_mess.data_password,empty_user.data_password); 
+                                    strcpy(user_from_mess.door_access,empty_user.door_access);
+
+
+
+                            }
 
                           break;
 
@@ -337,19 +351,14 @@ void app_message_handler(app_message_t app_message){
                               {
 
                                 char usr[USER_DISPLAY_MAX_SIZE];
-//                                strncpy(usr, users_tab[j].data_login, sizeof(usr));
-//                                strncat(usr, ":", 1);
-//                                strncat(usr, users_tab[j].door_access, strlen(users_tab[j].door_access));
-//                                uint16_t usrlen =strlen(usr);
-
-
-
                                 strncpy(usr, "d", sizeof(usr));
                                 strncat(usr, ":", 1);
                                 strncat(usr, users_tab[j].data_login,  sizeof(usr));
                                 strncat(usr, ":", 1);
                                 strncat(usr, users_tab[j].door_access, strlen(users_tab[j].door_access));
                                 uint16_t usrlen =strlen(usr);
+
+
 
                                 ble_nus_string_send(&m_nus, usr, &usrlen);
                                 j++;

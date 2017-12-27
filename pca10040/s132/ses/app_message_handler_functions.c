@@ -68,6 +68,10 @@ char* create_replay_message(enum replay_message_type mess_type){
                     replay_message = "wp";
                     break;
 
+            case LOGIN_EXISTS:
+                    replay_message = "le";
+                    break;
+
           }
 
           return replay_message;
@@ -85,9 +89,20 @@ enum message_action from_char_to_enum ( char message_act){
            case 'd': return DISPLAY_USERS; break;
            default: return MESSAGE_ERROR; break;
            }
-          
 
 
+}
 
+
+bool is_login_exist(char* login, user_t users_tab[], uint8_t user_tab_size){
+
+        for(int i=0; i<user_tab_size;i++){
+
+              if(strcmp(login, users_tab[i].data_login) == 0){
+                  return true;
+              }
+        }
+
+        return false;
 }
 
