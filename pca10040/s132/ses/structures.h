@@ -12,21 +12,32 @@
 
 typedef struct 
 {
-         uint8_t *data_login;
-         uint8_t *data_password;
-         uint8_t *data_action;
-         uint8_t *data_doorId;
-         uint8_t *data_access;
+         char *data_login;
+         char *data_password;
+         char *data_action;
+         char *data_doorId;
+         char *data_access;
 
 } app_message_t;
 
 
+#define USER_NAME_SIZE                  10
+#define USER_PASSWORD_SIZE              10
+#define USER_ACCESS_SIZE                2
+
+#define USER_DISPLAY_MAX_SIZE            USER_NAME_SIZE + USER_ACCESS_SIZE + 2
 
 typedef struct 
 {
+<<<<<<< HEAD
          char data_login[MAX_LOGIN_SIZE];
          char data_password[MAX_PASSWORD_SIZE];
          char door_access[MAX_DOOR_ACCESS_SIZE];
+=======
+         char data_login[USER_NAME_SIZE];
+         char data_password[USER_PASSWORD_SIZE];
+         char door_access[USER_ACCESS_SIZE];
+>>>>>>> 6c30508ddbc9866c93827b9c8a3886597130fbea
 
 } user_t;
 

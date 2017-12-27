@@ -110,6 +110,9 @@
       <file file_name="../../../../../../components/softdevice/common/nrf_sdh_soc.c" />
     </folder>
     <file file_name="app_message_handler_functions.c" />
+    <configuration
+      Name="Debug"
+      debug_additional_load_file="C:/Users/Dawid/Downloads/Gotowe/nRF5_SDK_14.1.0_1dda907/components/softdevice/s132/hex/s132_nrf52_5.0.0_softdevice.hex" />
   </project>
   <configuration
     Name="Release"
