@@ -337,31 +337,26 @@ void app_message_handler(app_message_t app_message){
                               {
 
                                 char usr[USER_DISPLAY_MAX_SIZE];
-                                strncpy(usr, users_tab[j].data_login, sizeof(usr));
-                                strncat(usr, ":", 1);
-                                strncat(usr, users_tab[j].door_access, strlen(users_tab[j].door_access));
-                                uint16_t usrlen =strlen(usr);
-
-//                                  char usr[MAX_USER_STRING_SIZE];
-//                                  strncpy(usr, users_tab[j].data_login, sizeof(usr));
-//                                  strncat(usr, ":", 1);
-//                                  strncat(usr, users_tab[j].door_access, strlen(users_tab[j].door_access));
-//                                  uint16_t usrlen =strlen(usr);
-
-
-//                                strncpy(usr, "d", 1);
-//                                strncat(usr, ":", 1);
-//                                strncat(usr, users_tab[j].data_login, strlen(users_tab[j].data_login));
+//                                strncpy(usr, users_tab[j].data_login, sizeof(usr));
 //                                strncat(usr, ":", 1);
 //                                strncat(usr, users_tab[j].door_access, strlen(users_tab[j].door_access));
 //                                uint16_t usrlen =strlen(usr);
+
+
+
+                                strncpy(usr, "d", sizeof(usr));
+                                strncat(usr, ":", 1);
+                                strncat(usr, users_tab[j].data_login,  sizeof(usr));
+                                strncat(usr, ":", 1);
+                                strncat(usr, users_tab[j].door_access, strlen(users_tab[j].door_access));
+                                uint16_t usrlen =strlen(usr);
 
                                 ble_nus_string_send(&m_nus, usr, &usrlen);
                                 j++;
                               }
 
-                               uint16_t endlen = 3;
-                               ble_nus_string_send(&m_nus, "end", &endlen);
+                               uint16_t endlen = 5;
+                               ble_nus_string_send(&m_nus, "d:end", &endlen);
                              break;
 
 
