@@ -25,19 +25,14 @@ typedef struct
 #define USER_PASSWORD_SIZE              10
 #define USER_ACCESS_SIZE                2
 
-#define USER_DISPLAY_MAX_SIZE            USER_NAME_SIZE + USER_ACCESS_SIZE + 2
+#define USER_DISPLAY_MAX_SIZE            USER_NAME_SIZE + USER_ACCESS_SIZE + 5
 
 typedef struct 
 {
-<<<<<<< HEAD
-         char data_login[MAX_LOGIN_SIZE];
-         char data_password[MAX_PASSWORD_SIZE];
-         char door_access[MAX_DOOR_ACCESS_SIZE];
-=======
+
          char data_login[USER_NAME_SIZE];
          char data_password[USER_PASSWORD_SIZE];
          char door_access[USER_ACCESS_SIZE];
->>>>>>> 6c30508ddbc9866c93827b9c8a3886597130fbea
 
 } user_t;
 

@@ -176,73 +176,6 @@ static void gap_params_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
-
-<<<<<<< HEAD
- // function to handle messages from application
-=======
-
-/**@brief Function for handling the data from the Nordic UART Service.
- *
- * @details This function will process the data received from the Nordic UART BLE Service and send
- *          it to the UART module.
- *
- * @param[in] p_nus    Nordic UART Service structure.
- * @param[in] p_data   Data to be send to UART module.
- * @param[in] length   Length of the data.
- */
-/**@snippet [Handling the data received over BLE] */
-static void nus_data_handler(ble_nus_evt_t * p_evt)
-{
-
-    if (p_evt->type == BLE_NUS_EVT_RX_DATA)
-    {
-        uint32_t err_code;
-
-        NRF_LOG_DEBUG("Received data from BLE NUS. Writing data on UART.");
-        NRF_LOG_HEXDUMP_DEBUG(p_evt->params.rx_data.p_data, p_evt->params.rx_data.length);
-
-
-        uint32_t data_length = p_evt->params.rx_data.length;
-        static  char data_array[BLE_NUS_MAX_DATA_LEN];
-        static  char data_char[] = {':'};
-         char *data_login;
-         char *data_password;
-         char *data_action;
-         char *data_doorId;
-         char *data_access;
-     
-
-         for (uint32_t i = 0; i < data_length; i++){
-
-                data_array[i] = p_evt->params.rx_data.p_data[i];
-
-         }
-         data_array[data_length] = "\0";
-
-            data_action = strtok(data_array,data_char);
-            data_doorId = strtok(NULL, data_char);
-            data_login = strtok(NULL, data_char);
-            data_password = strtok(NULL, data_char);
-            data_access = strtok(NULL, data_char);
-      
-           app_message_t app_message;
-           app_message.data_action = data_action;
-           app_message.data_doorId = data_doorId;
-           app_message.data_login = data_login;
-           app_message.data_password = data_password;
-           app_message.data_access = data_access;
-
-         NRF_LOG_INFO("Message to handle: %s, %s, %s, %s, %s", app_message.data_action,  app_message.data_doorId,  app_message.data_login, app_message.data_password, app_message.data_access );
-
-         app_message_handler(app_message);
-
-
-    }
-
-}
-
-
->>>>>>> 6c30508ddbc9866c93827b9c8a3886597130fbea
 void app_message_handler(app_message_t app_message){
 
 
@@ -284,11 +217,8 @@ void app_message_handler(app_message_t app_message){
                         break;
 
                 //close door
-<<<<<<< HEAD
                 case CLOSE_DOOR: 
-=======
-                case 'c': 
->>>>>>> 6c30508ddbc9866c93827b9c8a3886597130fbea
+
                         
                         NRF_LOG_INFO("Door close: %c", doorId);
                         uint8_t *cmessage = close_door(doorId);  
@@ -406,23 +336,18 @@ void app_message_handler(app_message_t app_message){
                               while(strcmp(users_tab[j].data_login, empty_user.data_login) != 0)
                               {
 
-<<<<<<< HEAD
-                                char usr[MAX_USER_STRING_SIZE];
-                                strncpy(usr, users_tab[j].data_login, sizeof(usr));
-=======
                                 char usr[USER_DISPLAY_MAX_SIZE];
-                                strncpy(usr, users_tab[j].data_login, strlen(users_tab[j].data_login) );
-                               // strncpy(usr, users_tab[j].data_login, sizeof(usr) );
->>>>>>> 6c30508ddbc9866c93827b9c8a3886597130fbea
+                                strncpy(usr, users_tab[j].data_login, sizeof(usr));
                                 strncat(usr, ":", 1);
                                 strncat(usr, users_tab[j].door_access, strlen(users_tab[j].door_access));
                                 uint16_t usrlen =strlen(usr);
 
-//                                char usr[MAX_USER_STRING_SIZE];
-//                                strncpy(usr, users_tab[j].data_login, strlen(users_tab[j].data_login));
-//                                strncat(usr, ":", 1);
-//                                strncat(usr, users_tab[j].door_access, strlen(users_tab[j].door_access));
-//                                uint16_t usrlen =strlen(usr);
+//                                  char usr[MAX_USER_STRING_SIZE];
+//                                  strncpy(usr, users_tab[j].data_login, sizeof(usr));
+//                                  strncat(usr, ":", 1);
+//                                  strncat(usr, users_tab[j].door_access, strlen(users_tab[j].door_access));
+//                                  uint16_t usrlen =strlen(usr);
+
 
 //                                strncpy(usr, "d", 1);
 //                                strncat(usr, ":", 1);
@@ -451,6 +376,8 @@ void app_message_handler(app_message_t app_message){
         }
 }
 
+
+ // function to handle messages from application
 
 
 /**@brief Function for handling the data from the Nordic UART Service.
@@ -509,10 +436,11 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
          app_message_handler(app_message);
 
 
-
     }
 
 }
+
+
 
 
 
