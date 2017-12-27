@@ -6,7 +6,7 @@
 #define LED_EXTERNAL2                    30
 
 
-uint8_t* open_door(uint8_t door_id){
+char* open_door(uint8_t door_id){
 
   switch(door_id){
     
@@ -24,7 +24,7 @@ uint8_t* open_door(uint8_t door_id){
 
 }
 
-uint8_t * close_door(uint8_t door_id){
+char * close_door(uint8_t door_id){
 
   switch(door_id){
     
@@ -42,7 +42,7 @@ uint8_t * close_door(uint8_t door_id){
 }
 
 
-uint8_t* create_replay_message(enum replay_message_type mess_type){
+char* create_replay_message(enum replay_message_type mess_type){
 
           uint8_t *replay_message;
           switch (mess_type)
@@ -71,5 +71,23 @@ uint8_t* create_replay_message(enum replay_message_type mess_type){
           }
 
           return replay_message;
+}
+
+enum message_action from_char_to_enum ( char message_act){
+
+           switch(message_act){
+
+           case 'a': return LOGIN_AS_ADMIN; break;
+           case 'u': return LOGIN_AS_USER; break;
+           case 's': return SAVE_USER; break;
+           case 'o': return OPEN_DOOR; break;
+           case 'c': return CLOSE_DOOR; break;
+           case 'd': return DISPLAY_USERS; break;
+           default: return MESSAGE_ERROR; break;
+           }
+          
+
+
+
 }
 

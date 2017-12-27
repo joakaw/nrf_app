@@ -5,10 +5,11 @@
 #include "structures.h"
 
 
-uint8_t* open_door(uint8_t door_id);
-uint8_t* close_door(uint8_t door_id);
+char* open_door(uint8_t door_id);
+char* close_door(uint8_t door_id);
 
 
-uint8_t* create_replay_message(enum replay_message_type mess_type);
+char* create_replay_message(enum replay_message_type mess_type);
+enum message_action from_char_to_enum ( char message_action);
 
 #endif 
