@@ -53,6 +53,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 #include "nordic_common.h"
 #include "nrf.h"
 #include "ble_hci.h"
@@ -68,6 +69,8 @@
 #include "app_uart.h"
 #include "app_util_platform.h"
 #include "bsp_btn_ble.h"
+
+//#include "app_timer.c"
 
 #if defined (UART_PRESENT)
 #include "nrf_uart.h"
@@ -108,7 +111,7 @@
 #define UART_RX_BUF_SIZE                256                                         /**< UART RX buffer size. */
 #define LED_EXTERNAL1                    29
 #define LED_EXTERNAL2                    30
-#define MAX_USERS_SIZE                   10
+#define MAX_USERS_SIZE                   20
 
 
 
@@ -208,6 +211,7 @@ void app_message_handler(app_message_t app_message){
                 // open door
                 case OPEN_DOOR: 
                         
+                        
                         NRF_LOG_INFO("Door open: %c", doorId);
                         uint8_t *message = open_door(doorId); 
                         for (uint32_t i = 0; i < 3; i++){
@@ -265,11 +269,11 @@ void app_message_handler(app_message_t app_message){
                                           uint8_t *acc_mess;
 
                                           if( strcmp(users_tab[i].door_access, "1") == 0) {
-                                                  acc_mess = "1";
+                                                  acc_mess = "a:1";
                                           } else if ( strcmp(users_tab[i].door_access, "2") == 0){
-                                                      acc_mess = "2";
+                                                      acc_mess = "a:2";
                                           }else if ( strcmp(users_tab[i].door_access, "12") == 0){
-                                                      acc_mess = "12";
+                                                      acc_mess = "a:12";
                                           }
 
                                           NRF_LOG_INFO("Accesses sent:  %s",acc_mess);
@@ -312,12 +316,9 @@ void app_message_handler(app_message_t app_message){
 
                                       uint8_t *reply_exist = create_replay_message(LOGIN_EXISTS);
                                       ble_nus_string_send(&m_nus, reply_exist, &rel_length);
-
                             }
                             else
                             {
-
-
                                     for(int i = 9; i > 0; i--){
 
                                           users_tab[i] = users_tab[i-1];
@@ -336,9 +337,6 @@ void app_message_handler(app_message_t app_message){
                                     strcpy(user_from_mess.data_login,empty_user.data_login);
                                     strcpy(user_from_mess.data_password,empty_user.data_password); 
                                     strcpy(user_from_mess.door_access,empty_user.door_access);
-
-
-
                             }
 
                           break;
@@ -358,8 +356,6 @@ void app_message_handler(app_message_t app_message){
                                 strncat(usr, users_tab[j].door_access, strlen(users_tab[j].door_access));
                                 uint16_t usrlen =strlen(usr);
 
-
-
                                 ble_nus_string_send(&m_nus, usr, &usrlen);
                                 j++;
                               }
@@ -376,7 +372,7 @@ void app_message_handler(app_message_t app_message){
                               char *err_reply = create_replay_message(ERROR);
                               ble_nus_string_send(&m_nus, err_reply, &rel_length);
                               break;
-            
+           
         }
 }
 
@@ -443,11 +439,6 @@ static void nus_data_handler(ble_nus_evt_t * p_evt)
     }
 
 }
-
-
-
-
-
 
 
 /**@snippet [Handling the data received over BLE] */
@@ -923,6 +914,9 @@ static void power_manage(void)
 }
 
 
+
+
+
 /**@brief Application main function.
  */
 int main(void)
@@ -952,12 +946,6 @@ int main(void)
     NRF_LOG_INFO("UART Start!");
     err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
-
-    //users tab initializations
-
-
-   
-
 
 
     // Enter main loop.
